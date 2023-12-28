@@ -1,3 +1,25 @@
+@import 'sweetalert2/dist/sweetalert2.css';
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+[x-cloak] {
+    display: none;
+}
+
+.swal2-question {
+    @apply dark:!text-white;
+}
+
+.swal2-popup {
+    @apply dark:!bg-gray-800 dark:!text-white;
+}
+
+.swal2-confirm {
+    @apply !bg-indigo-600 dark:!bg-indigo-400;
+}
+
+.swal2-cancel {
+    @apply !bg-gray-700 dark:!bg-gray-500;
+}
