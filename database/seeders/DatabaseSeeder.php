@@ -52,8 +52,9 @@ class DatabaseSeeder extends Seeder
         $email = 'admin@testdomain.com';
         if (!User::where('email', $email)->count()) {
             $user = User::factory()->create([
-                'name' => 'Administrator',
+                'name' => 'Admin',
                 'email' => $email,
+                'is_active' => true,
             ]);
             $user->syncRoles([RoleEnum::ADMIN->value]);
         }

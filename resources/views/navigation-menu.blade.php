@@ -13,16 +13,21 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
                     <x-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
+                        {{ __('lang.dashboard') }}
                     </x-nav-link>
-                    @can('hotels:list')
-                        <x-nav-link href="{{ route('hotels.index') }}" :active="request()->routeIs('hotels.*')">
-                            {{ __('Hotels') }}
+                    @can('users:list')
+                        <x-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                            {{ __('lang.users') }}
                         </x-nav-link>
                     @endcan
-                    @can('rooms:list')
-                        <x-nav-link href="{{ route('rooms.index') }}" :active="request()->routeIs('rooms.*')">
-                            {{ __('Rooms') }}
+                    @can('roles:list')
+                        <x-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
+                            {{ __('lang.roles') }}
+                        </x-nav-link>
+                    @endcan
+                    @can('hotels:list')
+                        <x-nav-link href="{{ route('hotels.index') }}" :active="request()->routeIs('hotels.*')">
+                            {{ __('lang.hotels') }}
                         </x-nav-link>
                     @endcan
                 </div>
@@ -36,7 +41,7 @@
                             <x-slot name="trigger">
                                 <span class="inline-flex rounded-md">
                                     <button type="button" class="inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-gray-500 dark:text-gray-400 bg-white dark:bg-gray-800 hover:text-gray-700 dark:hover:text-gray-300 focus:outline-none focus:bg-gray-50 dark:focus:bg-gray-700 active:bg-gray-50 dark:active:bg-gray-700 transition ease-in-out duration-150">
-                                        {{ Auth::user()->currentTeam->name }}
+                                        {{ Auth::user()?->currentTeam?->name ?? __('lang.team') }}
 
                                         <svg class="ms-2 -me-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                                             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 15L12 18.75 15.75 15m-7.5-6L12 5.25 15.75 9" />
@@ -49,17 +54,19 @@
                                 <div class="w-60">
                                     <!-- Team Management -->
                                     <div class="block px-4 py-2 text-xs text-gray-400">
-                                        {{ __('Manage Team') }}
+                                        {{ __('lang.manage_teams') }}
                                     </div>
 
                                     <!-- Team Settings -->
-                                    <x-dropdown-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}">
-                                        {{ __('Team Settings') }}
-                                    </x-dropdown-link>
+                                    @if (isset(Auth::user()->currentTeam))
+                                        <x-dropdown-link href="{{ route('teams.show', Auth::user()?->currentTeam?->id ?? 'X') }}">
+                                            {{ __('lang.team_settigs') }}
+                                        </x-dropdown-link>
+                                    @endif
 
-                                    @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
+                                    @can('teams:create', Laravel\Jetstream\Jetstream::newTeamModel())
                                         <x-dropdown-link href="{{ route('teams.create') }}">
-                                            {{ __('Create New Team') }}
+                                            {{ __('lang.create_new_arg', ['arg' => strtolower(__('lang.team'))]) }}
                                         </x-dropdown-link>
                                     @endcan
 
@@ -68,7 +75,7 @@
                                         <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                                         <div class="block px-4 py-2 text-xs text-gray-400">
-                                            {{ __('Switch Teams') }}
+                                            {{ __('lang.switch_arg', ['arg' => strtolower(__('lang.teams'))]) }}
                                         </div>
 
                                         @foreach (Auth::user()->allTeams() as $team)
@@ -105,16 +112,16 @@
                         <x-slot name="content">
                             <!-- Account Management -->
                             <div class="block px-4 py-2 text-xs text-gray-400">
-                                {{ __('Manage Account') }}
+                                {{ __('lang.manage_account') }}
                             </div>
 
                             <x-dropdown-link href="{{ route('profile.show') }}">
-                                {{ __('Profile') }}
+                                {{ __('lang.profile') }}
                             </x-dropdown-link>
 
                             @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                                 <x-dropdown-link href="{{ route('api-tokens.index') }}">
-                                    {{ __('API Tokens') }}
+                                    {{ __('lang.api_tokens') }}
                                 </x-dropdown-link>
                             @endif
 
@@ -126,7 +133,7 @@
 
                                 <x-dropdown-link href="{{ route('logout') }}"
                                          @click.prevent="$root.submit();">
-                                    {{ __('Log Out') }}
+                                    {{ __('lang.logout') }}
                                 </x-dropdown-link>
                             </form>
                         </x-slot>
@@ -150,8 +157,23 @@
     <div :class="{'block': open, 'hidden': ! open}" class="hidden sm:hidden">
         <div class="pt-2 pb-3 space-y-1">
             <x-responsive-nav-link href="{{ route('dashboard') }}" :active="request()->routeIs('dashboard')">
-                {{ __('Dashboard') }}
+                {{ __('lang.dashboard') }}
             </x-responsive-nav-link>
+            @can('users:list')
+                <x-responsive-nav-link href="{{ route('users.index') }}" :active="request()->routeIs('users.*')">
+                    {{ __('lang.users') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('roles:list')
+                <x-responsive-nav-link href="{{ route('roles.index') }}" :active="request()->routeIs('roles.*')">
+                    {{ __('lang.roles') }}
+                </x-responsive-nav-link>
+            @endcan
+            @can('hotels:list')
+                <x-responsive-nav-link href="{{ route('hotels.index') }}" :active="request()->routeIs('hotels.*')">
+                    {{ __('lang.hotels') }}
+                </x-responsive-nav-link>
+            @endcan
         </div>
 
         <!-- Responsive Settings Options -->
@@ -172,22 +194,21 @@
             <div class="mt-3 space-y-1">
                 <!-- Account Management -->
                 <x-responsive-nav-link href="{{ route('profile.show') }}" :active="request()->routeIs('profile.show')">
-                    {{ __('Profile') }}
+                    {{ __('lang.profile') }}
                 </x-responsive-nav-link>
 
                 @if (Laravel\Jetstream\Jetstream::hasApiFeatures())
                     <x-responsive-nav-link href="{{ route('api-tokens.index') }}" :active="request()->routeIs('api-tokens.index')">
-                        {{ __('API Tokens') }}
+                        {{ __('lang.api_tokens') }}
                     </x-responsive-nav-link>
                 @endif
 
                 <!-- Authentication -->
                 <form method="POST" action="{{ route('logout') }}" x-data>
                     @csrf
-
                     <x-responsive-nav-link href="{{ route('logout') }}"
                                    @click.prevent="$root.submit();">
-                        {{ __('Log Out') }}
+                        {{ __('lang.logout') }}
                     </x-responsive-nav-link>
                 </form>
 
@@ -196,17 +217,19 @@
                     <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                     <div class="block px-4 py-2 text-xs text-gray-400">
-                        {{ __('Manage Team') }}
+                        {{ __('lang.manage_teams') }}
                     </div>
 
                     <!-- Team Settings -->
-                    <x-responsive-nav-link href="{{ route('teams.show', Auth::user()->currentTeam->id) }}" :active="request()->routeIs('teams.show')">
-                        {{ __('Team Settings') }}
-                    </x-responsive-nav-link>
+                    @if (isset(Auth::user()->currentTeam))
+                        <x-responsive-nav-link href="{{ route('teams.show', Auth::user()?->currentTeam?->id ?? 'X') }}" :active="request()->routeIs('teams.show')">
+                            {{ __('lang.team_settigs') }}
+                        </x-responsive-nav-link>
+                    @endif
 
                     @can('create', Laravel\Jetstream\Jetstream::newTeamModel())
                         <x-responsive-nav-link href="{{ route('teams.create') }}" :active="request()->routeIs('teams.create')">
-                            {{ __('Create New Team') }}
+                            {{ __('lang.create_new_arg', ['arg' => strtolower(__('lang.team'))]) }}
                         </x-responsive-nav-link>
                     @endcan
 
@@ -215,7 +238,7 @@
                         <div class="border-t border-gray-200 dark:border-gray-600"></div>
 
                         <div class="block px-4 py-2 text-xs text-gray-400">
-                            {{ __('Switch Teams') }}
+                            {{ __('lang.switch_arg', ['arg' => strtolower(__('lang.teams'))]) }}
                         </div>
 
                         @foreach (Auth::user()->allTeams() as $team)

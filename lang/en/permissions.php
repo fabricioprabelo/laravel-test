@@ -1,23 +1,26 @@
 <?php
 
 return [
-    'user-list' => 'Users list',
-    'user-create' => 'Users create',
-    'user-update' => 'Users update',
-    'user-delete' => 'Users delete',
+    'permission' => 'Permission',
+    'permissions' => 'Permissions',
 
-    'role-list' => 'Roles list',
-    'role-create' => 'Roles create',
-    'role-update' => 'Roles update',
-    'role-delete' => 'Roles delete',
+    'users-list' => 'Users list',
+    'users-create' => 'Users create',
+    'users-update' => 'Users update',
+    'users-delete' => 'Users delete',
 
-    'hotel-list' => 'Hotels list',
-    'hotel-create' => 'Hotels create',
-    'hotel-update' => 'Hotels update',
-    'hotel-delete' => 'Hotels delete',
+    'roles-list' => 'Roles list',
+    'roles-create' => 'Roles create',
+    'roles-update' => 'Roles update',
+    'roles-delete' => 'Roles delete',
 
-    'room-list' => 'Rooms list',
-    'room-create' => 'Rooms create',
-    'room-update' => 'Rooms update',
-    'room-delete' => 'Rooms delete',
+    'hotels-list' => 'Hotels list',
+    'hotels-create' => 'Hotels create',
+    'hotels-update' => 'Hotels update',
+    'hotels-delete' => 'Hotels delete',
+
+    'teams-list' => 'Teams list',
+    'teams-create' => 'Teams create',
+    'teams-update' => 'Teams update',
+    'teams-delete' => 'Teams delete',
 ];

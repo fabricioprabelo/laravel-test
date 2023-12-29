@@ -1,23 +1,26 @@
 <?php
 
 return [
-    'user-list' => 'Listar usuários',
-    'user-create' => 'Criar usuários',
-    'user-update' => 'Editar usuários',
-    'user-delete' => 'Excluir usuários',
+    'permission' => 'Permissão',
+    'permissions' => 'Permissões',
 
-    'role-list' => 'Listar regras',
-    'role-create' => 'Criar regras',
-    'role-update' => 'Editar regras',
-    'role-delete' => 'Excluir regras',
+    'users-list' => 'Listar usuários',
+    'users-create' => 'Criar usuários',
+    'users-update' => 'Editar usuários',
+    'users-delete' => 'Excluir usuários',
 
-    'hotel-list' => 'Listar hotéis',
-    'hotel-create' => 'Criar hotéis',
-    'hotel-update' => 'Editar hotéis',
-    'hotel-delete' => 'Excluir hotéis',
+    'roles-list' => 'Listar regras',
+    'roles-create' => 'Criar regras',
+    'roles-update' => 'Editar regras',
+    'roles-delete' => 'Excluir regras',
 
-    'room-list' => 'Listar quartos',
-    'room-create' => 'Criar quartos',
-    'room-update' => 'Editar quartos',
-    'room-delete' => 'Excluir quartos',
+    'hotels-list' => 'Listar hotéis',
+    'hotels-create' => 'Criar hotéis',
+    'hotels-update' => 'Editar hotéis',
+    'hotels-delete' => 'Excluir hotéis',
+
+    'teams-list' => 'Listar equipe',
+    'teams-create' => 'Criar equipe',
+    'teams-update' => 'Editar equipe',
+    'teams-delete' => 'Excluir equipe',
 ];

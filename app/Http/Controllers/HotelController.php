@@ -6,6 +6,8 @@ use App\Enums\PermissionEnum;
 use App\Http\Requests\StoreHotelRequest;
 use App\Http\Requests\UpdateHotelRequest;
 use App\Models\Hotel;
+use Exception;
+use Illuminate\Support\Facades\DB;
 
 class HotelController extends Controller
 {
@@ -43,9 +45,42 @@ class HotelController extends Controller
      */
     public function store(StoreHotelRequest $request)
     {
-        Hotel::create($request->validated());
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('hotels.index');
+            $hotel = Hotel::create($request->only([
+                'name',
+                'address',
+                'complement',
+                'neighborhood',
+                'city',
+                'state',
+                'zip_code',
+                'website'
+            ]));
+
+            if ($request->only('rooms')) {
+                $rooms = $request->only('rooms')['rooms'];
+                foreach($rooms as $room) {
+                    $hotel->rooms()->create([
+                        'name' => $room['name'],
+                        'description' => $room['description'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return redirect()->route('hotels.edit', $hotel);
+
+        } catch (Exception $e) {
+
+            DB::rollBack();
+
+            return back()
+                ->withInput($request->all())
+                ->withErrors($e->getMessage());
+        }
     }
 
     /**
@@ -53,6 +88,7 @@ class HotelController extends Controller
      */
     public function show(Hotel $hotel)
     {
+        $hotel->with(['rooms']);
         return view('hotels.edit', compact('hotel'));
     }
 
@@ -61,6 +97,7 @@ class HotelController extends Controller
      */
     public function edit(Hotel $hotel)
     {
+        $hotel->with(['rooms']);
         return view('hotels.edit', compact('hotel'));
     }
 
@@ -69,9 +106,42 @@ class HotelController extends Controller
      */
     public function update(UpdateHotelRequest $request, Hotel $hotel)
     {
-        $hotel->update($request->validated());
+        try {
+            DB::beginTransaction();
 
-        return redirect()->route('hotels.index');
+            $hotel->update($request->only([
+                    'name',
+                    'address',
+                    'complement',
+                    'neighborhood',
+                    'city',
+                    'state',
+                    'zip_code',
+                    'website',
+                ]));
+
+            if ($request->only('rooms')) {
+                $rooms = $request->only('rooms')['rooms'];
+                foreach($rooms as $room) {
+                    $hotel->rooms()->create([
+                        'name' => $room['name'],
+                        'description' => $room['description'],
+                    ]);
+                }
+            }
+
+            DB::commit();
+
+            return back();
+
+        } catch (Exception $e) {
+
+            DB::rollBack();
+
+            return back()
+                ->withInput($request->all())
+                ->withErrors($e->getMessage());
+        }
     }
 
     /**

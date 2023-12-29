@@ -30,6 +30,9 @@ class StoreHotelRequest extends FormRequest
             'state' => 'required|max:255',
             'zip_code' => 'required|max:255',
             'website' => 'url|max:255',
+            'rooms' => "array",
+            'rooms.*.name' => "required|max:255",
+            'rooms.*.description' => "max:255",
         ];
     }
 }
