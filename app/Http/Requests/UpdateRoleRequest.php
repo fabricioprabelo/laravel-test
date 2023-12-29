@@ -26,18 +26,12 @@ class UpdateRoleRequest extends FormRequest
             'name' => [
                 'required',
                 'max:255',
-                Rule::unique('hotels')->ignore($this->route('hotel')->id)
+                Rule::unique('roles')
+                    ->where('guard_name', 'web')
+                    ->ignore($this->route('role')->id)
             ],
-            'address' => 'required|max:255',
-            'complement' => 'max:255',
-            'neighborhood' => 'max:255',
-            'city' => 'required|max:255',
-            'state' => 'required|max:255',
-            'zip_code' => 'required|max:255',
-            'website' => 'url|max:255',
-            'rooms' => "array",
-            'rooms.*.name' => "required|max:255",
-            'rooms.*.description' => "max:255",
+            'users' => "array",
+            'permissions' => "array",
         ];
     }
 }

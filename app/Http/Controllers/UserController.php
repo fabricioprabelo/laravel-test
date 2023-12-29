@@ -5,9 +5,12 @@ namespace App\Http\Controllers;
 use App\Enums\PermissionEnum;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Permission;
+use App\Models\Role;
 use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -37,7 +40,9 @@ class UserController extends Controller
      */
     public function create()
     {
-        return view('users.create');
+        $roles = Role::where('guard_name', 'web')->get();
+        $permissions = Permission::where('guard_name', 'web')->get();
+        return view('users.create', compact('roles', 'permissions'));
     }
 
     /**
@@ -48,25 +53,25 @@ class UserController extends Controller
         try {
             DB::beginTransaction();
 
-            $user = User::create($request->only([
+            $post = $request->only([
                 'name',
-                'address',
-                'complement',
-                'neighborhood',
-                'city',
-                'state',
-                'zip_code',
-                'website'
-            ]));
+                'email',
+                'password'
+            ]);
+
+
+            $post['password'] = Hash::make(trim($post['password']));
+
+            $user = User::create($post);
 
             if ($request->only('roles')) {
                 $roles = $request->only('roles')['roles'];
-                foreach($roles as $role) {
-                    $user->roles()->create([
-                        'name' => $role['name'],
-                        'description' => $role['description'],
-                    ]);
-                }
+                $user->syncRoles($roles);
+            }
+
+            if ($request->only('permissions')) {
+                $permissions = $request->only('permissions')['permissions'];
+                $user->syncPermissions($permissions);
             }
 
             DB::commit();
@@ -88,8 +93,11 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
-        $user->with(['roles']);
-        return view('users.edit', compact('user'));
+        $roles = Role::where('guard_name', 'web')->get();
+        $permissions = Permission::where('guard_name', 'web')->get();
+        $user->selected_roles = $user->selectedRoles();
+        $user->selected_permissions = $user->selectedPermissions();
+        return view('users.edit', compact('user', 'roles', 'permissions'));
     }
 
     /**
@@ -97,8 +105,11 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
-        $user->with(['roles']);
-        return view('users.edit', compact('user'));
+        $roles = Role::where('guard_name', 'web')->get();
+        $permissions = Permission::where('guard_name', 'web')->get();
+        $user->selected_roles = $user->selectedRoles();
+        $user->selected_permissions = $user->selectedPermissions();
+        return view('users.edit', compact('user', 'roles', 'permissions'));
     }
 
     /**
@@ -109,25 +120,28 @@ class UserController extends Controller
         try {
             DB::beginTransaction();
 
-            $user->update($request->only([
-                    'name',
-                    'address',
-                    'complement',
-                    'neighborhood',
-                    'city',
-                    'state',
-                    'zip_code',
-                    'website',
-                ]));
+            $post = $request->only([
+                'name',
+                'email',
+                'password'
+            ]);
+
+            if (trim($post['password'])) {
+                $post['password'] = Hash::make(trim($post['password']));
+            } else {
+                unset($post['password']);
+            }
+
+            $user->update($post);
 
             if ($request->only('roles')) {
                 $roles = $request->only('roles')['roles'];
-                foreach($roles as $role) {
-                    $user->roles()->create([
-                        'name' => $role['name'],
-                        'description' => $role['description'],
-                    ]);
-                }
+                $user->syncRoles($roles);
+            }
+
+            if ($request->only('permissions')) {
+                $permissions = $request->only('permissions')['permissions'];
+                $user->syncPermissions($permissions);
             }
 
             DB::commit();

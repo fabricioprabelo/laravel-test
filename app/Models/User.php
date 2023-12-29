@@ -37,7 +37,6 @@ class User extends Authenticatable
         'name',
         'email',
         'password',
-        'is_active'
     ];
 
     /**
@@ -59,7 +58,6 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_active' => 'boolean'
     ];
 
     /**
@@ -70,6 +68,24 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function selectedRoles()
+    {
+        $selected_roles = [];
+        foreach($this->roles as $role) {
+            $selected_roles[] = $role->name;
+        }
+        return $selected_roles;
+    }
+
+    public function selectedPermissions()
+    {
+        $selected_permissions = [];
+        foreach($this->permissions as $permission) {
+            $selected_permissions[] = $permission->name;
+        }
+        return $selected_permissions;
+    }
 
     public function updateProfilePhoto(UploadedFile $photo, $storagePath = 'profile-photos')
     {

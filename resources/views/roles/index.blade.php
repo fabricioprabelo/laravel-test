@@ -19,12 +19,6 @@
                             <th scope="col" class="px-6 py-3">
                                 {{ __('lang.role') }}
                             </th>
-                            <th scope="col" class="px-6 py-3">
-                                {{ __('lang.permissions') }}
-                            </th>
-                            <th scope="col" class="px-6 py-3">
-                                {{ __('lang.guard_name') }}
-                            </th>
                             <th scope="col" class="flex px-6 py-3 justify-center items-center">
                                 <x-heroicon-o-bolt class="w-4 h-4 text-gray-500 dark:text-gray-200" />
                             </th>
@@ -35,12 +29,6 @@
                             <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
                                 <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap">
                                     {{ $role->name }}
-                                </td>
-                                <td class="px-6 py-4 font-medium text-gray-900 dark:text-white whitespace-nowrap w-28">
-                                    {{ $role->permissions()->count() }}
-                                </td>
-                                <td class="px-6 py-4 w-40 font-medium text-gray-900 dark:text-white whitespace-nowrap">
-                                    {{ $role->guard_name }}
                                 </td>
                                 <td class="px-6 py-4 w-44 items-center">
                                     @can('roles:update')

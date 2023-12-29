@@ -5,7 +5,9 @@ namespace App\Http\Controllers;
 use App\Enums\PermissionEnum;
 use App\Http\Requests\StoreRoleRequest;
 use App\Http\Requests\UpdateRoleRequest;
+use App\Models\Permission;
 use App\Models\Role;
+use App\Models\User;
 use Exception;
 use Illuminate\Support\Facades\DB;
 
@@ -27,7 +29,8 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::with(['permissions'])->paginate();
+        $roles = Role::where('guard_name', 'web')
+            ->paginate();
 
         return view('roles.index', compact('roles'));
     }
@@ -37,7 +40,9 @@ class RoleController extends Controller
      */
     public function create()
     {
-        return view('roles.create');
+        $users = User::all();
+        $permissions = Permission::where('guard_name', 'web')->get();
+        return view('roles.create', compact('permissions', 'users'));
     }
 
     /**
@@ -48,25 +53,33 @@ class RoleController extends Controller
         try {
             DB::beginTransaction();
 
-            $role = Role::create($request->only([
+            $post = $request->only([
                 'name',
-                'address',
-                'complement',
-                'neighborhood',
-                'city',
-                'state',
-                'zip_code',
-                'website'
-            ]));
+            ]);
 
-            if ($request->only('roles')) {
-                $roles = $request->only('roles')['roles'];
-                foreach($roles as $role) {
-                    $role->roles()->create([
-                        'name' => $role['name'],
-                        'description' => $role['description'],
-                    ]);
+            $role = Role::create(array_merge($post, ['guard_name' => 'web']));
+            $roleApi = Role::create(array_merge($post, ['guard_name' => 'api']));
+
+            if ($request->only('users')) {
+                $users = $request->only('users')['users'];
+                DB::table(config('permission.table_names.model_has_roles'))
+                    ->where('role_id', $role->id)
+                    ->delete();
+                foreach($users as $user_id) {
+                    $user = User::where('id', $user_id)->firstOrFail();
+                    DB::table(config('permission.table_names.model_has_roles'))
+                        ->insert([
+                            'role_id' => $role->id,
+                            'model_type' => get_class($user),
+                            'model_id' => $user_id,
+                        ]);
                 }
+            }
+
+            if ($request->only('permissions')) {
+                $permissions = $request->only('permissions')['permissions'];
+                $role->syncPermissions($permissions);
+                $roleApi->syncPermissions($permissions);
             }
 
             DB::commit();
@@ -88,8 +101,11 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
-        $role->with(['roles']);
-        return view('roles.edit', compact('role'));
+        $users = User::all();
+        $permissions = Permission::where('guard_name', 'web')->get();
+        $role->selected_users = $role->selectedUsers();
+        $role->selected_permissions = $role->selectedPermissions();
+        return view('roles.edit', compact('role', 'users', 'permissions'));
     }
 
     /**
@@ -97,8 +113,11 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
-        $role->with(['roles']);
-        return view('roles.edit', compact('role'));
+        $users = User::all();
+        $permissions = Permission::where('guard_name', 'web')->get();
+        $role->selected_users = $role->selectedUsers();
+        $role->selected_permissions = $role->selectedPermissions();
+        return view('roles.edit', compact('role', 'users', 'permissions'));
     }
 
     /**
@@ -109,25 +128,35 @@ class RoleController extends Controller
         try {
             DB::beginTransaction();
 
-            $role->update($request->only([
-                    'name',
-                    'address',
-                    'complement',
-                    'neighborhood',
-                    'city',
-                    'state',
-                    'zip_code',
-                    'website',
-                ]));
+            $post = $request->only([
+                'name',
+            ]);
 
-            if ($request->only('roles')) {
-                $roles = $request->only('roles')['roles'];
-                foreach($roles as $role) {
-                    $role->roles()->create([
-                        'name' => $role['name'],
-                        'description' => $role['description'],
-                    ]);
+            $roleApi = Role::where('name', $role->name)->firstOrFail();
+
+            $role->update($post);
+            $roleApi->update($post);
+
+            if ($request->only('users')) {
+                $users = $request->only('users')['users'];
+                DB::table(config('permission.table_names.model_has_roles'))
+                    ->where('role_id', $role->id)
+                    ->delete();
+                foreach($users as $user_id) {
+                    $user = User::where('id', $user_id)->firstOrFail();
+                    DB::table(config('permission.table_names.model_has_roles'))
+                        ->insert([
+                            'role_id' => $role->id,
+                            'model_type' => get_class($user),
+                            'model_id' => $user_id,
+                        ]);
                 }
+            }
+
+            if ($request->only('permissions')) {
+                $permissions = $request->only('permissions')['permissions'];
+                $role->syncPermissions($permissions);
+                $roleApi->syncPermissions($permissions);
             }
 
             DB::commit();
@@ -149,8 +178,30 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
-        $role->delete();
+        try {
 
-        return redirect()->route('roles.index');
+            DB::beginTransaction();
+
+            $role->delete();
+
+            DB::table(config('permission.table_names.role_has_permissions'))
+                        ->where('role_id', $role->id)
+                        ->delete();
+
+            DB::table(config('permission.table_names.model_has_roles'))
+                        ->where('role_id', $role->id)
+                        ->delete();
+
+            DB::commit();
+
+            return redirect()->route('roles.index');
+
+        } catch (Exception $e) {
+
+            DB::rollBack();
+
+            return back()
+                ->withErrors($e->getMessage());
+        }
     }
 }

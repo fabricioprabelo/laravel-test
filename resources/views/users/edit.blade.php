@@ -17,7 +17,10 @@
                             <button id="user-tab" data-tabs-target="#user" type="button" role="tab" aria-controls="about" aria-selected="true" class="inline-block p-4 text-blue-600 rounded-ss-lg hover:bg-gray-100 dark:bg-gray-800 dark:hover:bg-gray-700 dark:text-blue-500">{{ __('lang.user') }}</button>
                         </li>
                         <li class="me-2">
-                            <button id="rooms-tab" data-tabs-target="#rooms" type="button" role="tab" aria-controls="services" aria-selected="false" class="inline-block p-4 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300">{{ __('lang.roles') }}</button>
+                            <button id="roles-tab" data-tabs-target="#roles" type="button" role="tab" aria-controls="services" aria-selected="false" class="inline-block p-4 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300">{{ __('lang.roles') }}</button>
+                        </li>
+                        <li class="me-2">
+                            <button id="permissions-tab" data-tabs-target="#permissions" type="button" role="tab" aria-controls="services" aria-selected="false" class="inline-block p-4 hover:text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 dark:hover:text-gray-300">{{ __('lang.permissions') }}</button>
                         </li>
                     </ul>
                     <div id="defaultTabContent" class="py-0">
@@ -25,12 +28,13 @@
                             <x-validation-errors class="mb-4" />
                             @include('users.form', ['user' => $user])
                         </div>
-                        <div class="hidden p-4 bg-white rounded-lg md:px-8 md:pt-8 dark:bg-gray-800" id="rooms" role="tabpanel" aria-labelledby="rooms-tab">
+                        <div class="hidden p-4 bg-white rounded-lg md:px-8 md:pt-8 dark:bg-gray-800" id="roles" role="tabpanel" aria-labelledby="roles-tab">
                             <x-validation-errors class="mb-4" />
-                            <x-button type="button" id="addRoom">
-                                {{ __('lang.add_arg', ['arg' => strtolower(__('lang.room'))]) }}
-                            </x-button>
-                            @include('users.rooms', ['user' => $user])
+                            @include('users.roles', ['user' => $user, 'roles' => $roles])
+                        </div>
+                        <div class="hidden p-4 bg-white rounded-lg md:px-8 md:pt-8 dark:bg-gray-800" id="permissions" role="tabpanel" aria-labelledby="permissions-tab">
+                            <x-validation-errors class="mb-4" />
+                            @include('users.permissions', ['user' => $user, 'permissions' => $permissions])
                         </div>
                     </div>
                     <div class="relative overflow-x-auto p-4 mt-4 md:mt-8 border-t">

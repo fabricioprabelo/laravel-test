@@ -3,6 +3,7 @@
 namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 
 class StoreRoleRequest extends FormRequest
 {
@@ -22,17 +23,14 @@ class StoreRoleRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => 'required|max:255|unique:hotels',
-            'address' => 'required|max:255',
-            'complement' => 'max:255',
-            'neighborhood' => 'max:255',
-            'city' => 'required|max:255',
-            'state' => 'required|max:255',
-            'zip_code' => 'required|max:255',
-            'website' => 'url|max:255',
-            'rooms' => "array",
-            'rooms.*.name' => "required|max:255",
-            'rooms.*.description' => "max:255",
+            'name' => [
+                'required',
+                'max:255',
+                Rule::unique('roles')
+                    ->where('guard_name', 'web')
+            ],
+            'users' => "array",
+            'permissions' => "array",
         ];
     }
 }
